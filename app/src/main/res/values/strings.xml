@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ChatFirebase</string>
+    <string name="texto_entrar">Entrar</string>
+    <string name="texto_nao_tem_conta">Não tenho uma conta? Crie aquir.</string>
+</resources>
