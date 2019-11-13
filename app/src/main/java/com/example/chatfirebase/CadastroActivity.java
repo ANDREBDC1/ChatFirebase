@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,14 +17,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.SuccessContinuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -120,10 +119,27 @@ public class CadastroActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if(task.isSuccessful()) {
+                    String uId = task.getResult().getUser().getUid();
                     Log.i("Teste", task.getResult().getUser().getUid());
                     Toast.makeText(CadastroActivity.this, "Cadastro realizado com sucesso!", Toast.LENGTH_LONG);
+                    Usuario usuario = new Usuario(uId, editNome.getText().toString(), editSenha.getText().toString(), editEmail.getText().toString());
 
-                    SalvarImagemFireStorage();
+                    FirebaseFirestore.getInstance().collection("Usuarios")
+                            .add(usuario).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Log.i("Erro", documentReference.getId());
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            Log.e("Erro", e.getMessage());
+                        }
+                    });
+
+                    //SalvarImagemFireStorage();
                 }
 
             }
@@ -131,9 +147,7 @@ public class CadastroActivity extends AppCompatActivity {
         .addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-
-                Log.e("Teste", e.getMessage());
-
+                Log.e("Erro", e.getMessage());
             }
         });
     }
@@ -141,7 +155,7 @@ public class CadastroActivity extends AppCompatActivity {
     private void SalvarImagemFireStorage() {
 
         String nomeArquivo = UUID.randomUUID().toString();
-        final  StorageReference ref = FirebaseStorage.getInstance().getReference("Imagem/" +nomeArquivo);
+        final StorageReference ref = FirebaseStorage.getInstance().getReference("imagem/" + nomeArquivo);
 
         ref.putFile(uriImagemSelecionada).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -158,6 +172,8 @@ public class CadastroActivity extends AppCompatActivity {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
+                if(e == null)
+                    return;
 
                 Log.e("Erro", e.getMessage());
             }
