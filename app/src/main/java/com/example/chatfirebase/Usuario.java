@@ -5,6 +5,7 @@ public class Usuario {
     private String nome;
     private String senha;
     private String email;
+    private String token;
 
     public String getEmail() {
         return email;
@@ -32,11 +33,12 @@ public class Usuario {
         this.id = id;
     }
 
-    public Usuario(String id, String nome, String senha, String email) {
+    public Usuario(String id, String nome, String senha, String email, String token) {
         this.id = id;
         this.nome = nome;
         this.senha = senha;
         this.email = email;
+        this.token = token;
     }
 
     public String getNome() {
@@ -45,5 +47,13 @@ public class Usuario {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

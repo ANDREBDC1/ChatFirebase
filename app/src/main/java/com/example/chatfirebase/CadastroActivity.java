@@ -25,6 +25,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -119,10 +120,12 @@ public class CadastroActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if(task.isSuccessful()) {
+                    String token = FirebaseInstanceId.getInstance().getToken();
+
                     String uId = task.getResult().getUser().getUid();
                     Log.i("Teste", task.getResult().getUser().getUid());
                     Toast.makeText(CadastroActivity.this, "Cadastro realizado com sucesso!", Toast.LENGTH_LONG);
-                    Usuario usuario = new Usuario(uId, editNome.getText().toString(), editSenha.getText().toString(), editEmail.getText().toString());
+                    Usuario usuario = new Usuario(uId, editNome.getText().toString(), editSenha.getText().toString(), editEmail.getText().toString(), token);
 
                     FirebaseFirestore.getInstance().collection("Usuarios")
                             .add(usuario).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -138,6 +141,9 @@ public class CadastroActivity extends AppCompatActivity {
                             Log.e("Erro", e.getMessage());
                         }
                     });
+
+                    Intent intent =  new Intent(CadastroActivity.this, FCMServico.class);
+                    startService(intent);
 
                     //SalvarImagemFireStorage();
                 }
